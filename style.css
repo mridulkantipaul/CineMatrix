@@ -1,0 +1,432 @@
+body {
+    background-color: #0f171e; /* Prime Video Dark Blue/Black */
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding-bottom: 50px;
+}
+
+/* Navbar Styling */
+.custom-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background-color: #1a242f;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+.nav-left, .nav-right { display: flex; align-items: center; gap: 20px; }
+.logo { color: #00a8e1; margin: 0; font-weight: 700; font-size: 1.5rem; }
+.nav-link { color: #aaaaaa; text-decoration: none; font-weight: 600; font-size: 1rem; transition: color 0.2s;}
+.nav-link:hover, .nav-link.active { color: #ffffff; }
+
+.search-container { display: flex; background: #0f171e; border: 1px solid #333; border-radius: 5px; overflow: hidden;}
+.search-container input { background: none; border: none; color: white; padding: 8px 15px; outline: none; }
+.search-container button { background: #00a8e1; border: none; color: white; padding: 0 15px; cursor: pointer; font-weight: bold;}
+
+.profile-icon { background: #333; padding: 8px 10px; border-radius: 50%; cursor: pointer;}
+
+/* Main Content & Rows */
+.main-content { padding: 30px 40px; }
+.section-title { font-weight: 600; margin-bottom: 15px; font-size: 1.3rem; }
+
+/* Horizontal Scrolling Magic */
+.movie-row {
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    padding-bottom: 15px;
+    scrollbar-width: none; /* Firefox */
+}
+.movie-row::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+
+/* =========================================
+   🧊 3D CARD STYLES & PARALLAX
+   ========================================= */
+.movie-card {
+    flex: 0 0 200px; /* Fixed width for cards */
+    border-radius: 8px;
+    overflow: hidden;
+    background: #1a242f;
+    cursor: pointer;
+    /* Fast transition for smooth mouse tracking */
+    transition: transform 0.1s ease-out, box-shadow 0.1s ease-out; 
+    transform-style: preserve-3d; /* Tells the browser this is a 3D object */
+    will-change: transform;
+    position: relative;
+}
+
+.movie-poster {
+    border-radius: 8px;
+    width: 100%;
+    /* Ensures the image stays flat on the card while the card tilts */
+    transform: translateZ(0); 
+}
+
+/* Make the title literally float off the card! */
+.movie-title {
+    transform: translateZ(40px); /* Pushes the text 40 pixels closer to the screen */
+    text-shadow: 0px 5px 10px rgba(0,0,0,0.9);
+}
+
+/* Chatbot Styling */
+#chatbot-container {
+    position: fixed; bottom: 80px; right: 20px; width: 350px;
+    background: #1a242f; border-radius: 12px; border: 1px solid #333;
+    display: none; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 1001;
+}
+#chatbot-header { background: #00a8e1; color: white; padding: 15px; font-weight: bold; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; }
+#chatbot-messages { height: 300px; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+.bot-msg { background: #333; padding: 10px 15px; border-radius: 15px 15px 15px 0; align-self: flex-start; max-width: 80%; font-size: 0.9rem;}
+.user-msg { background: #00a8e1; color: white; padding: 10px 15px; border-radius: 15px 15px 0 15px; align-self: flex-end; max-width: 80%; font-size: 0.9rem;}
+#chatbot-input-area { display: flex; padding: 10px; border-top: 1px solid #333; }
+#chatbot-input-area input { flex: 1; padding: 10px; border: none; background: #0f171e; color: white; border-radius: 5px; outline: none;}
+#chatbot-input-area button { background: #00a8e1; color: white; border: none; padding: 10px 15px; margin-left: 5px; border-radius: 5px; cursor: pointer;}
+
+#open-chat-btn {
+    position: fixed; bottom: 20px; right: 20px; background: #00a8e1; color: white;
+    border: none; padding: 12px 20px; border-radius: 25px; font-weight: bold; font-size: 1rem;
+    box-shadow: 0 5px 15px rgba(0,168,225,0.4); cursor: pointer; z-index: 1000;
+}
+
+/* =========================================
+   🎬 PREMIUM HERO BANNER STYLES
+   ========================================= */
+.hero-banner {
+    position: relative;
+    height: 70vh; 
+    background: #0f171e url('https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
+    color: white;
+    display: flex;
+    align-items: center;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 650px;
+    padding-left: 50px;
+    margin-top: 40px;
+}
+
+.hero-title {
+    font-size: 4.5rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+}
+
+.hero-meta {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+}
+
+.match-score { color: #46d369; font-weight: bold; }
+
+.hero-description {
+    font-size: 1.2rem;
+    line-height: 1.5;
+    margin-bottom: 25px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+    color: #e5e5e5;
+}
+
+.hero-buttons button {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    margin-right: 15px;
+    transition: all 0.2s ease;
+}
+
+.btn-play { background-color: white; color: black; }
+.btn-play:hover { background-color: rgba(255,255,255,0.75); }
+
+.btn-info { background-color: rgba(109, 109, 110, 0.7); color: white; }
+.btn-info:hover { background-color: rgba(109, 109, 110, 0.4); }
+
+.hero-fade-bottom {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 150px;
+    background: linear-gradient(to bottom, rgba(15,23,30,0) 0%, rgba(15,23,30,1) 100%);
+    z-index: 1;
+}
+
+/* =========================================
+   🎬 NETFLIX-STYLE VIDEO DETAIL OVERLAY
+   ========================================= */
+.detail-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: 2000; display: flex; align-items: center;
+    background-color: #0b0f15; overflow: hidden;
+}
+
+.detail-bg-video {
+    position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+    object-fit: cover; 
+    z-index: 1;
+    filter: brightness(40%) blur(4px); 
+}
+
+.detail-gradient {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2;
+    background: linear-gradient(to right, rgba(11,15,21,1) 10%, rgba(11,15,21,0.6) 50%, rgba(11,15,21,0) 100%);
+}
+
+.detail-content-wrapper {
+    position: relative; z-index: 3; padding: 60px; max-width: 800px; color: white;
+}
+
+.close-btn {
+    position: absolute; top: -20px; right: 20px; background: none; border: none;
+    color: white; font-size: 2.5rem; cursor: pointer; transition: transform 0.2s; z-index: 4;
+}
+.close-btn:hover { transform: scale(1.2); color: #00a8e1; }
+
+.detail-title { font-size: 4.5rem; font-weight: 800; margin-bottom: 10px; }
+.detail-meta { font-size: 1.1rem; font-weight: bold; color: #e5e5e5; margin-bottom: 15px; }
+.detail-description { font-size: 1.2rem; line-height: 1.6; color: #cccccc; }
+
+.detail-extra-info p { margin-bottom: 5px; font-size: 1rem; }
+.text-secondary { color: #a3a3a3 !important; }
+
+/* =========================================
+   📺 TRAILER POPUP MODAL
+   ========================================= */
+.trailer-modal {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background-color: rgba(0, 0, 0, 0.95); z-index: 3000;
+    display: flex; justify-content: center; align-items: center; flex-direction: column;
+}
+.trailer-video-container { width: 80%; max-width: 1200px; }
+.focused-video { width: 100%; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); outline: none; }
+
+.close-trailer-btn {
+    align-self: flex-end; margin-right: 10%; margin-bottom: 20px;
+    background: none; border: 2px solid white; color: white;
+    padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer;
+}
+.close-trailer-btn:hover { background: white; color: black; }
+
+/* =========================================
+   🎬 CINEMATIC LOADING SCREEN (NEW!)
+   ========================================= */
+.loader-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0b0b0b; 
+    z-index: 9999; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+}
+
+.loader-content {
+    text-align: center;
+}
+
+.loader-logo {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #e50914; 
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px rgba(229, 9, 20, 0.5); 
+    animation: pulse 1.5s infinite;
+}
+
+.loader-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top: 4px solid #e50914;
+    border-radius: 50%;
+    margin: 0 auto;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.fade-out {
+    opacity: 0;
+    visibility: hidden;
+}
+/* =========================================
+   ⭐ USER REVIEW SYSTEM
+   ========================================= */
+.star-rating .star {
+    font-size: 1.8rem;
+    color: #444; /* Dark grey by default */
+    cursor: pointer;
+    transition: color 0.2s;
+    user-select: none;
+}
+
+/* When a star is clicked/active, turn it Gold */
+.star-rating .star.active {
+    color: #f5c518; /* IMDB/Prime Gold */
+    text-shadow: 0 0 10px rgba(245, 197, 24, 0.4);
+}
+
+#user-review-input::placeholder {
+    color: #888;
+}
+#user-review-input:focus {
+    box-shadow: none;
+    border-color: #f5c518 !important;
+}
+
+/* =========================================
+   🔄 HERO BANNER ANIMATIONS & SIZING FIX
+   ========================================= */
+#hero-banner {
+    transition: background-image 1s ease-in-out;
+    
+    /* THE FIX: Tell the image how to fit the wide screen properly */
+    background-size: cover !important;
+    
+    /* Shift the focus to the top 15% of the image so we don't chop off heads! */
+    background-position: center 15% !important; 
+    
+    background-repeat: no-repeat !important;
+}
+
+#hero-content {
+    transition: opacity 0.5s ease-in-out;
+}
+
+/* =========================================
+   🔍 LIVE AUTOCOMPLETE SUGGESTIONS
+   ========================================= */
+.search-container {
+    position: relative; /* Crucial so the dropdown knows where to attach */
+    overflow: visible !important; /* Overrides the old hidden overflow */
+}
+
+.suggestions-box {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: #1a242f;
+    border: 1px solid #333;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    max-height: 350px;
+    overflow-y: auto;
+    z-index: 9999;
+    box-shadow: 0px 15px 30px rgba(0,0,0,0.9);
+}
+
+.suggestion-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #2a3441;
+    transition: background 0.2s ease;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover {
+    background-color: #00a8e1; /* Lights up Prime Video Blue */
+}
+
+.suggestion-item:hover .suggestion-title {
+    color: white;
+}
+
+.suggestion-poster {
+    width: 35px;
+    height: 50px;
+    border-radius: 4px;
+    object-fit: cover;
+    box-shadow: 0px 2px 5px rgba(0,0,0,0.5);
+}
+
+.suggestion-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0;
+    color: #cccccc;
+    transition: color 0.2s ease;
+}
+
+/* =========================================
+   🎛️ FILTER MENU STYLING
+   ========================================= */
+.dropdown-menu-dark {
+    background-color: #1a242f;
+    border: 1px solid #333;
+}
+.dropdown-item {
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+.dropdown-item:hover {
+    background-color: #00a8e1;
+    color: white;
+}
+.dropdown-header {
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* =========================================
+   🛠️ POP-UP SCROLL FIX
+   ========================================= */
+.detail-overlay {
+    overflow-y: auto !important; /* Forces a scrollbar to appear if content is too tall */
+    height: 100vh; /* Locks the window to your screen height */
+}
+
+.detail-content-wrapper {
+    padding-bottom: 100px !important; /* Adds some breathing room at the very bottom */
+}
+
+/* =========================================
+   🛠️ THE FLEXBOX CLIPPING FIX
+   ========================================= */
+.detail-overlay {
+    align-items: flex-start !important; /* THE MAGIC LINE: Starts the box at the top instead of locking it in the middle */
+    overflow-y: auto !important;
+    padding-top: 5vh !important; /* Adds a nice gap at the top of the screen */
+}
+
+.detail-content-wrapper {
+    margin-top: 0 !important; 
+    margin-bottom: 15vh !important; /* Pushes the bottom up so the "Save Review" button is fully visible */
+    height: auto !important;
+    max-height: none !important; /* Unlocks the height restrictions */
+}
+
+/* Make sure the background video doesn't scroll away! */
+.detail-bg-video, .detail-gradient {
+    position: fixed !important;
+}
