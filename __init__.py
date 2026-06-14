@@ -1,64 +1,134 @@
-from __future__ import annotations
+"""When it comes to combining multiple controller or view functions
+(however you want to call them) you need a dispatcher. A simple way
+would be applying regular expression tests on the ``PATH_INFO`` and
+calling registered callback functions that return the value then.
 
-import typing as t
+This module implements a much more powerful system than simple regular
+expression matching because it can also convert values in the URLs and
+build URLs.
 
-from .accept import Accept as Accept
-from .accept import CharsetAccept as CharsetAccept
-from .accept import LanguageAccept as LanguageAccept
-from .accept import MIMEAccept as MIMEAccept
-from .auth import Authorization as Authorization
-from .auth import WWWAuthenticate as WWWAuthenticate
-from .cache_control import RequestCacheControl as RequestCacheControl
-from .cache_control import ResponseCacheControl as ResponseCacheControl
-from .csp import ContentSecurityPolicy as ContentSecurityPolicy
-from .etag import ETags as ETags
-from .file_storage import FileMultiDict as FileMultiDict
-from .file_storage import FileStorage as FileStorage
-from .headers import EnvironHeaders as EnvironHeaders
-from .headers import Headers as Headers
-from .mixins import ImmutableDictMixin as ImmutableDictMixin
-from .mixins import ImmutableHeadersMixin as ImmutableHeadersMixin
-from .mixins import ImmutableListMixin as ImmutableListMixin
-from .mixins import ImmutableMultiDictMixin as ImmutableMultiDictMixin
-from .mixins import UpdateDictMixin as UpdateDictMixin
-from .range import ContentRange as ContentRange
-from .range import IfRange as IfRange
-from .range import Range as Range
-from .structures import CallbackDict as CallbackDict
-from .structures import CombinedMultiDict as CombinedMultiDict
-from .structures import HeaderSet as HeaderSet
-from .structures import ImmutableDict as ImmutableDict
-from .structures import ImmutableList as ImmutableList
-from .structures import ImmutableMultiDict as ImmutableMultiDict
-from .structures import ImmutableTypeConversionDict as ImmutableTypeConversionDict
-from .structures import iter_multi_items as iter_multi_items
-from .structures import MultiDict as MultiDict
-from .structures import TypeConversionDict as TypeConversionDict
+Here a simple example that creates a URL map for an application with
+two subdomains (www and kb) and some URL rules:
 
+.. code-block:: python
 
-def __getattr__(name: str) -> t.Any:
-    import warnings
+    m = Map([
+        # Static URLs
+        Rule('/', endpoint='static/index'),
+        Rule('/about', endpoint='static/about'),
+        Rule('/help', endpoint='static/help'),
+        # Knowledge Base
+        Subdomain('kb', [
+            Rule('/', endpoint='kb/index'),
+            Rule('/browse/', endpoint='kb/browse'),
+            Rule('/browse/<int:id>/', endpoint='kb/browse'),
+            Rule('/browse/<int:id>/<int:page>', endpoint='kb/browse')
+        ])
+    ], default_subdomain='www')
 
-    if name == "OrderedMultiDict":
-        from .structures import _OrderedMultiDict
+If the application doesn't use subdomains it's perfectly fine to not set
+the default subdomain and not use the `Subdomain` rule factory. The
+endpoint in the rules can be anything, for example import paths or
+unique identifiers. The WSGI application can use those endpoints to get the
+handler for that URL.  It doesn't have to be a string at all but it's
+recommended.
 
-        warnings.warn(
-            "'OrderedMultiDict' is deprecated and will be removed in Werkzeug"
-            " 3.2. Use 'MultiDict' instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return _OrderedMultiDict
+Now it's possible to create a URL adapter for one of the subdomains and
+build URLs:
 
-    if name == "ImmutableOrderedMultiDict":
-        from .structures import _ImmutableOrderedMultiDict
+.. code-block:: python
 
-        warnings.warn(
-            "'OrderedMultiDict' is deprecated and will be removed in Werkzeug"
-            " 3.2. Use 'ImmutableMultiDict' instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return _ImmutableOrderedMultiDict
+    c = m.bind('example.com')
 
-    raise AttributeError(name)
+    c.build("kb/browse", dict(id=42))
+    'http://kb.example.com/browse/42/'
+
+    c.build("kb/browse", dict())
+    'http://kb.example.com/browse/'
+
+    c.build("kb/browse", dict(id=42, page=3))
+    'http://kb.example.com/browse/42/3'
+
+    c.build("static/about")
+    '/about'
+
+    c.build("static/index", force_external=True)
+    'http://www.example.com/'
+
+    c = m.bind('example.com', subdomain='kb')
+
+    c.build("static/about")
+    'http://www.example.com/about'
+
+The first argument to bind is the server name *without* the subdomain.
+Per default it will assume that the script is mounted on the root, but
+often that's not the case so you can provide the real mount point as
+second argument:
+
+.. code-block:: python
+
+    c = m.bind('example.com', '/applications/example')
+
+The third argument can be the subdomain, if not given the default
+subdomain is used.  For more details about binding have a look at the
+documentation of the `MapAdapter`.
+
+And here is how you can match URLs:
+
+.. code-block:: python
+
+    c = m.bind('example.com')
+
+    c.match("/")
+    ('static/index', {})
+
+    c.match("/about")
+    ('static/about', {})
+
+    c = m.bind('example.com', '/', 'kb')
+
+    c.match("/")
+    ('kb/index', {})
+
+    c.match("/browse/42/23")
+    ('kb/browse', {'id': 42, 'page': 23})
+
+If matching fails you get a ``NotFound`` exception, if the rule thinks
+it's a good idea to redirect (for example because the URL was defined
+to have a slash at the end but the request was missing that slash) it
+will raise a ``RequestRedirect`` exception. Both are subclasses of
+``HTTPException`` so you can use those errors as responses in the
+application.
+
+If matching succeeded but the URL rule was incompatible to the given
+method (for example there were only rules for ``GET`` and ``HEAD`` but
+routing tried to match a ``POST`` request) a ``MethodNotAllowed``
+exception is raised.
+"""
+
+from .converters import AnyConverter as AnyConverter
+from .converters import BaseConverter as BaseConverter
+from .converters import FloatConverter as FloatConverter
+from .converters import IntegerConverter as IntegerConverter
+from .converters import PathConverter as PathConverter
+from .converters import UnicodeConverter as UnicodeConverter
+from .converters import UUIDConverter as UUIDConverter
+from .converters import ValidationError as ValidationError
+from .exceptions import BuildError as BuildError
+from .exceptions import NoMatch as NoMatch
+from .exceptions import RequestAliasRedirect as RequestAliasRedirect
+from .exceptions import RequestPath as RequestPath
+from .exceptions import RequestRedirect as RequestRedirect
+from .exceptions import RoutingException as RoutingException
+from .exceptions import WebsocketMismatch as WebsocketMismatch
+from .map import Map as Map
+from .map import MapAdapter as MapAdapter
+from .matcher import StateMachineMatcher as StateMachineMatcher
+from .rules import EndpointPrefix as EndpointPrefix
+from .rules import parse_converter_args as parse_converter_args
+from .rules import Rule as Rule
+from .rules import RuleFactory as RuleFactory
+from .rules import RuleTemplate as RuleTemplate
+from .rules import RuleTemplateFactory as RuleTemplateFactory
+from .rules import Subdomain as Subdomain
+from .rules import Submount as Submount
